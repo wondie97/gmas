@@ -3,90 +3,103 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Q플레이 리바이벌</title>
+    <title>Q플레이 틀린그림 찾기 아레나</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="site-header">
-      <h1>Q플레이 리바이벌</h1>
-      <p>추억의 넥슨 Q플레이 퍼즐을 웹에서 즐겨보세요!</p>
+      <div>
+        <p class="pill">Q플레이 팬 프로젝트</p>
+        <h1>멀티플레이 틀린그림 찾기</h1>
+        <p>
+          고전 Q플레이 감성의 배경 위에서 두 장의 장면을 비교해 차이를 찾고,
+          친구들과 실시간으로 점수를 겨뤄보세요.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button id="start-btn" type="button" class="primary">새 게임</button>
+        <button id="next-btn" type="button">다음 장면</button>
+      </div>
     </header>
 
-    <main class="game-shell">
-      <section class="board-panel" aria-live="polite">
-        <div class="board-meta">
-          <div class="stat">
-            <span class="label">점수</span>
-            <strong id="score">0</strong>
+    <main class="layout">
+      <section class="lobby">
+        <h2>플레이어 보드</h2>
+        <form id="player-form" class="player-form" autocomplete="off">
+          <input
+            id="player-name"
+            name="player-name"
+            type="text"
+            placeholder="플레이어 이름"
+            maxlength="12"
+            required
+          />
+          <button type="submit" class="primary">추가</button>
+        </form>
+        <p class="hint">플레이어 카드를 눌러 차례를 전환할 수 있어요.</p>
+        <ul id="player-list" class="player-list" aria-live="polite"></ul>
+      </section>
+
+      <section class="arena" aria-label="틀린그림 찾기 무대">
+        <div class="scene-meta">
+          <div>
+            <p class="pill">현재 장면</p>
+            <h2 id="level-title">-</h2>
+            <p id="level-desc" class="level-desc"></p>
           </div>
-          <div class="stat">
-            <span class="label">레벨</span>
-            <strong id="level">1</strong>
-          </div>
-          <div class="stat">
-            <span class="label">콤보</span>
-            <strong id="combo">0</strong>
-          </div>
-          <div class="stat">
-            <span class="label">플레이 시간</span>
-            <strong id="timer">00:00</strong>
+          <div class="round-stats">
+            <div>
+              <span class="label">남은 시간</span>
+              <strong id="timer">00:00</strong>
+            </div>
+            <div>
+              <span class="label">찾은 차이</span>
+              <strong id="found-count">0 / 0</strong>
+            </div>
           </div>
         </div>
 
-        <div id="board" class="board" role="grid" aria-label="퍼즐 보드"></div>
-        <div id="message" class="message" role="status"></div>
+        <div class="canvas-wrapper">
+          <figure>
+            <figcaption>원본</figcaption>
+            <canvas id="scene-left" width="480" height="320"></canvas>
+          </figure>
+          <figure>
+            <figcaption>변형</figcaption>
+            <canvas id="scene-right" width="480" height="320"></canvas>
+          </figure>
+        </div>
+
+        <div class="controls-panel">
+          <button id="hint-btn" type="button">힌트 사용</button>
+          <button id="reset-btn" type="button">현재 장면 리셋</button>
+          <p id="status" role="status">새 게임을 시작해 주세요.</p>
+        </div>
       </section>
 
-      <aside class="side-panel">
-        <section class="next-piece">
-          <h2>다음 블록</h2>
-          <div id="next-piece" class="preview" aria-label="다음 블록 미리보기"></div>
-        </section>
-
-        <section class="controls">
-          <h2>게임 컨트롤</h2>
-          <div class="buttons">
-            <button id="start-btn" type="button">새 게임</button>
-            <button id="pause-btn" type="button">일시 정지</button>
-            <button id="drop-btn" type="button">즉시 낙하</button>
-          </div>
-          <p class="hint">키보드 방향키와 <kbd>Space</kbd>로 조작할 수 있어요.</p>
-          <ul>
-            <li>⬅️ ➡️ : 좌우 이동</li>
-            <li>⬇️ : 빠르게 내리기</li>
-            <li>Space : 블록 색상 교체</li>
-          </ul>
-        </section>
-
-        <section class="history">
-          <h2>Q플레이는?</h2>
-          <p>
-            2000년대 초반 넥슨에서 서비스하던 퍼즐 게임으로, 색깔 블록을
-            조합하여 같은 색을 연결하면 점수를 얻는 방식입니다. 웹 버전에서는
-            추억의 룰을 현대적인 조작감으로 재구성했습니다.
-          </p>
-          <p>
-            더 높은 레벨로 갈수록 낙하 속도가 빨라지며 연속 폭발(콤보)로
-            추가 점수를 노릴 수 있습니다. 천천히 손을 풀어보고, 실시간으로
-            올라가는 점수를 확인해 보세요!
-          </p>
-        </section>
+      <aside class="log-panel">
+        <h2>하이라이트 &amp; 로그</h2>
+        <div class="legend">
+          <span class="badge success"></span> 발견 &middot;
+          <span class="badge hint"></span> 힌트 표시
+        </div>
+        <ul id="event-log" class="event-log" aria-live="polite"></ul>
       </aside>
     </main>
 
     <section class="how-to">
       <h2>게임 방법</h2>
       <ol>
-        <li>새 게임을 누르면 중앙 보드에 2칸짜리 블록이 등장합니다.</li>
-        <li>블록의 색깔을 맞추어 세 칸 이상 연결되도록 배치하세요.</li>
-        <li>세 칸 이상 연결되면 폭발하고 위의 블록이 떨어집니다.</li>
-        <li>콤보를 만들수록 추가 점수가 적용됩니다.</li>
-        <li>블록이 천장에 닿으면 게임이 종료됩니다.</li>
+        <li>플레이어를 추가하고 카드를 눌러 현재 차례를 선택합니다.</li>
+        <li>새 게임을 누르면 첫 장면의 두 이미지를 볼 수 있습니다.</li>
+        <li>원본과 변형 이미지의 차이를 찾아 클릭하세요. 정답이면 빛나는 링이 표시됩니다.</li>
+        <li>힌트는 라운드당 두 번까지 사용할 수 있으며, 사용 시 소량의 점수가 차감됩니다.</li>
+        <li>제한 시간 내 모든 차이를 찾으면 자동으로 다음 장면으로 넘어갈 수 있습니다.</li>
       </ol>
     </section>
 
     <footer>
-      <small>비공식 팬 프로젝트 · 원작 Q플레이의 분위기를 기념하기 위해 제작되었습니다.</small>
+      <small>ⓒ 팬메이드 · 고전 Q플레이 세계관을 재해석한 틀린그림 찾기</small>
     </footer>
 
     <script src="script.js" type="module"></script>
