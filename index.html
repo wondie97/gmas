@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Q플레이 틀린그림 찾기 아레나</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <p class="pill">Q플레이 팬 프로젝트</p>
+        <h1>멀티플레이 틀린그림 찾기</h1>
+        <p>
+          고전 Q플레이 감성의 배경 위에서 두 장의 장면을 비교해 차이를 찾고,
+          친구들과 실시간으로 점수를 겨뤄보세요.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button id="start-btn" type="button" class="primary">새 게임</button>
+        <button id="next-btn" type="button">다음 장면</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="lobby">
+        <h2>플레이어 보드</h2>
+        <form id="player-form" class="player-form" autocomplete="off">
+          <input
+            id="player-name"
+            name="player-name"
+            type="text"
+            placeholder="플레이어 이름"
+            maxlength="12"
+            required
+          />
+          <button type="submit" class="primary">추가</button>
+        </form>
+        <p class="hint">플레이어 카드를 눌러 차례를 전환할 수 있어요.</p>
+        <ul id="player-list" class="player-list" aria-live="polite"></ul>
+      </section>
+
+      <section class="arena" aria-label="틀린그림 찾기 무대">
+        <div class="scene-meta">
+          <div>
+            <p class="pill">현재 장면</p>
+            <h2 id="level-title">-</h2>
+            <p id="level-desc" class="level-desc"></p>
+          </div>
+          <div class="round-stats">
+            <div>
+              <span class="label">남은 시간</span>
+              <strong id="timer">00:00</strong>
+            </div>
+            <div>
+              <span class="label">찾은 차이</span>
+              <strong id="found-count">0 / 0</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <figure>
+            <figcaption>원본</figcaption>
+            <canvas id="scene-left" width="480" height="320"></canvas>
+          </figure>
+          <figure>
+            <figcaption>변형</figcaption>
+            <canvas id="scene-right" width="480" height="320"></canvas>
+          </figure>
+        </div>
+
+        <div class="controls-panel">
+          <button id="hint-btn" type="button">힌트 사용</button>
+          <button id="reset-btn" type="button">현재 장면 리셋</button>
+          <p id="status" role="status">새 게임을 시작해 주세요.</p>
+        </div>
+      </section>
+
+      <aside class="log-panel">
+        <h2>하이라이트 &amp; 로그</h2>
+        <div class="legend">
+          <span class="badge success"></span> 발견 &middot;
+          <span class="badge hint"></span> 힌트 표시
+        </div>
+        <ul id="event-log" class="event-log" aria-live="polite"></ul>
+      </aside>
+    </main>
+
+    <section class="how-to">
+      <h2>게임 방법</h2>
+      <ol>
+        <li>플레이어를 추가하고 카드를 눌러 현재 차례를 선택합니다.</li>
+        <li>새 게임을 누르면 첫 장면의 두 이미지를 볼 수 있습니다.</li>
+        <li>원본과 변형 이미지의 차이를 찾아 클릭하세요. 정답이면 빛나는 링이 표시됩니다.</li>
+        <li>힌트는 라운드당 두 번까지 사용할 수 있으며, 사용 시 소량의 점수가 차감됩니다.</li>
+        <li>제한 시간 내 모든 차이를 찾으면 자동으로 다음 장면으로 넘어갈 수 있습니다.</li>
+      </ol>
+    </section>
+
+    <footer>
+      <small>ⓒ 팬메이드 · 고전 Q플레이 세계관을 재해석한 틀린그림 찾기</small>
+    </footer>
+
+    <script src="script.js" type="module"></script>
+  </body>
+</html>
