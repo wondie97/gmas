@@ -77,15 +77,17 @@
     <canvas id="gameCanvas" width="960" height="540"></canvas>
   </div>
 
-  <script>
+<script>
   const $ = (id) => document.getElementById(id);
 
   function setMsg(msg, err = false) {
     const box = $("authMessage");
+    if (!box) return;
     box.textContent = msg || "";
     box.style.color = err ? "red" : "#333";
   }
 
+  // 탭 전환
   function showLoginTab() {
     $("loginForm").classList.remove("hidden");
     $("registerForm").classList.add("hidden");
@@ -102,46 +104,55 @@
     setMsg("");
   }
 
+  // 로그인/회원가입 UI 숨기고 캔버스 보여주기 + 프로필 로딩
   function showGame() {
     $("authOverlay").classList.add("hidden");
     $("gameRoot").classList.remove("hidden");
-
-    // 🔹 로그인 후 게임 루프 시작
-    if (window.gameMain && typeof window.gameMain.start === "function") {
-      window.gameMain.start();
-    }
+    loadProfileAndStartGame();   // 🔸 여기서 프로필+스프라이트까지 처리
   }
 
-  // 공통 POST 함수
-  async function apiPost(url, body, token) {
-    const headers = { "Content-Type": "application/json" };
-    if (token) headers["Authorization"] = "Bearer " + token;
+  async function apiPost(url, body) {
+    const token = localStorage.getItem("wondie_token");
 
     const res = await fetch(url, {
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: "Bearer " + token } : {})
+      },
       body: JSON.stringify(body),
     });
+
     return res.json();
   }
 
-  // 자동 로그인 시 사용자 상태 확인 (프로필 있는지)
-  async function checkMeAndRoute() {
-    const token = localStorage.getItem("wondie_token");
-    if (!token) return;
-
+  // 🔹 /api/me에서 캐릭터/닉네임 읽어와서
+  //    - 캐릭터 미선택이면 select.html로
+  //    - 선택되어 있으면 gameMain.start(profile)로 전달
+  async function loadProfileAndStartGame() {
     try {
-      const me = await apiPost("/api/me", {}, token);
-      if (!me.ok) return;
-
-      // 캐릭터/닉네임 설정 안 되어 있으면 → 프로필 설정 페이지
-      if (me.needProfile) {
-        window.location.href = "select.html";
-      } else {
-        showGame();
+      const me = await apiPost("/api/me", {});
+      if (!me.ok) {
+        setMsg(me.message || "프로필 불러오기 실패", true);
+        return;
       }
-    } catch (e) {
-      console.error(e);
+
+      if (me.needProfile) {
+        // 캐릭터/닉네임 미설정 → 선택 화면으로
+        window.location.href = "select.html";
+        return;
+      }
+
+      // 여기서부터 실제 게임 루프 시작
+      if (window.gameMain && typeof window.gameMain.start === "function") {
+        window.gameMain.start({
+          characterType: me.characterType || "human",
+          nickname: me.nickname || "플레이어",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setMsg("프로필 로딩 중 오류가 발생했습니다.", true);
     }
   }
 
@@ -149,45 +160,39 @@
     $("tabLogin").addEventListener("click", showLoginTab);
     $("tabRegister").addEventListener("click", showRegisterTab);
 
-    // 🔹 로그인
     $("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = $("loginEmail").value;
       const password = $("loginPassword").value;
 
       const data = await apiPost("/api/login", { email, password });
-      if (!data.ok) return setMsg(data.message || "로그인 실패", true);
+      if (!data.ok) return setMsg(data.message, true);
 
       localStorage.setItem("wondie_token", data.token);
-      if (window.net && typeof net.reconnect === "function") net.reconnect();
-
-      // 캐릭터/닉네임 없으면 select.html, 있으면 바로 게임
-      if (data.needProfile) {
-        window.location.href = "select.html";
-      } else {
-        showGame();
-      }
+      showGame();
     });
 
-    // 🔹 회원가입 (여기서는 이메일/비번만, 닉네임은 select에서)
     $("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = $("regEmail").value;
       const password = $("regPassword").value;
-      const nickname = $("regNickname").value; // 지금 폼에 있지만, 서버에서는 무시해도 됨 (또는 같이 저장해도 되고)
+      const nickname = $("regNickname").value;
 
       const data = await apiPost("/api/register", { email, password, nickname });
-      if (!data.ok) return setMsg(data.message || "회원가입 실패", true);
+      if (!data.ok) return setMsg(data.message, true);
 
       localStorage.setItem("wondie_token", data.token);
-      if (window.net && typeof net.reconnect === "function") net.reconnect();
-
-      // 새 유저니까 당연히 프로필 필요 → 캐릭터/닉네임 설정 화면으로
-      window.location.href = "select.html";
+      showGame();
     });
 
-    // 🔹 페이지 로드 시 자동 로그인 시도
-    checkMeAndRoute();
+    // 자동 로그인 시도
+    const token = localStorage.getItem("wondie_token");
+    if (token) {
+      // 바로 게임 영역 열고 프로필 로딩
+      $("authOverlay").classList.add("hidden");
+      $("gameRoot").classList.remove("hidden");
+      loadProfileAndStartGame();
+    }
   });
 </script>
 </body>

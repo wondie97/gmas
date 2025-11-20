@@ -1,0 +1,22 @@
+Create an 8-direction walking sprite sheet of a cute chibi character in soft pastel Animal Crossing style.
+Character concept: [여기에 캐릭터 컨셉 입력]
+
+The sprite sheet must include:
+- 8 directions: Down, Down-Left, Left, Up-Left, Up, Up-Right, Right, Down-Right
+- Each direction must contain 4 walking animation frames
+- All frames aligned to a consistent grid
+- High resolution transparent PNG
+- No labels, no text, no numbers
+
+Style requirements:
+- Animal Crossing–inspired soft shading
+- Warm pastel colors
+- Cute rounded outlines
+- Consistent proportions across all frames
+- Big expressive eyes, rounded face, adorable aesthetic
+- Gentle cartoon vibe with cozy color palette
+
+Output:
+- One single sprite sheet PNG (uniform grid)
+- Character looks identical in all directions
+- Full body visible
